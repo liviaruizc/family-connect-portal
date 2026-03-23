@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Family Connect – Resource Portal</title>
+  </head>
+  <body>
+    <section id="auth-shell" class="auth-shell">
+      <div class="auth-card">
+        <div class="auth-brand">
+          <svg class="brand-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="24" cy="24" r="24" fill="#1f3f8f"/>
+            <path fill="#fff" d="M24 34s-10-6.5-10-13a6 6 0 0 1 10-4.47A6 6 0 0 1 34 21c0 6.5-10 13-10 13z"/>
+          </svg>
+          <div>
+            <h1 class="auth-title">Family Connect Portal</h1>
+            <p class="auth-subtitle">Sign in to search, export, and manage community resources.</p>
+          </div>
+        </div>
+
+        <div class="auth-tabs">
+          <button id="login-tab" type="button" class="auth-tab active">Login</button>
+          <button id="signup-tab" type="button" class="auth-tab">Sign Up</button>
+        </div>
+
+        <form id="auth-form" class="email-form" novalidate>
+          <div id="full-name-row" class="hidden">
+            <label for="auth-full-name" class="form-label">Full Name</label>
+            <input id="auth-full-name" class="search-input" type="text" maxlength="120" />
+          </div>
+
+          <div>
+            <label for="auth-email" class="form-label">Email</label>
+            <input id="auth-email" class="search-input" type="email" maxlength="254" required />
+          </div>
+
+          <div>
+            <label for="auth-password" class="form-label">Password</label>
+            <input id="auth-password" class="search-input" type="password" minlength="6" required />
+          </div>
+
+          <div id="confirm-password-row" class="hidden">
+            <label for="auth-confirm-password" class="form-label">Confirm Password</label>
+            <input id="auth-confirm-password" class="search-input" type="password" minlength="6" />
+          </div>
+
+          <button id="auth-submit" type="submit" class="btn btn-primary auth-submit">Login</button>
+        </form>
+
+        <p id="auth-status" class="email-status" role="alert" aria-live="assertive"></p>
+      </div>
+    </section>
+
+    <div id="app-shell" class="hidden">
+      <header class="site-header">
+        <div class="header-inner">
+          <div class="brand">
+            <svg class="brand-icon" viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="24" fill="#1f3f8f"/>
+              <path fill="#fff" d="M24 34s-10-6.5-10-13a6 6 0 0 1 10-4.47A6 6 0 0 1 34 21c0 6.5-10 13-10 13z"/>
+            </svg>
+            <div>
+              <span class="brand-name">Family Connect</span>
+              <span class="brand-tagline">Resource Portal</span>
+            </div>
+          </div>
+
+          <div class="header-actions">
+            <button id="add-org-open" type="button" class="btn btn-outline hidden">Add Organization</button>
+            <button id="add-admin-open" type="button" class="btn btn-outline hidden">Add Admin</button>
+            <div class="user-chip">
+              <div>
+                <span id="user-name" class="user-name">Signed In</span>
+                <span id="user-role" class="user-role">Volunteer</span>
+              </div>
+              <button id="logout-button" type="button" class="btn btn-outline btn-small">Logout</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="search-section">
+          <div class="search-section-inner">
+            <h1 class="search-heading">Find Support Resources</h1>
+            <p class="search-subheading">
+              Search by organization name, category, or service to find the right help for the families you serve.
+            </p>
+
+            <form id="search-form" class="search-form" role="search" aria-label="Resource search">
+              <div class="search-row">
+                <div class="search-field">
+                  <label for="search-input" class="sr-only">Search resources</label>
+                  <input
+                    id="search-input"
+                    type="search"
+                    class="search-input"
+                    placeholder="Search by organization, category, or service…"
+                    maxlength="200"
+                    autocomplete="off"
+                    role="combobox"
+                    aria-expanded="false"
+                    aria-controls="autocomplete-list"
+                    aria-autocomplete="list"
+                  />
+                  <ul id="autocomplete-list" class="autocomplete-list hidden" role="listbox" aria-label="Search suggestions"></ul>
+                </div>
+
+                <label for="category-select" class="sr-only">Filter by category</label>
+                <select id="category-select" class="category-select" aria-label="Filter by category">
+                  <option value="">Browse by category…</option>
+                </select>
+
+                <label for="location-select" class="sr-only">Filter by location</label>
+                <select id="location-select" class="category-select" aria-label="Filter by location">
+                  <option value="">All locations</option>
+                </select>
+
+                <button type="submit" class="btn btn-primary search-btn" aria-label="Search">
+                  <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                    <path d="M21 19l-4.35-4.35A7.5 7.5 0 1 0 15 16.65L19.35 21 21 19zM10.5 16a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z"/>
+                  </svg>
+                  Search
+                </button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="results-section" class="results-section hidden" aria-live="polite">
+          <div class="results-inner">
+            <p id="results-count" class="results-count"></p>
+            <div id="results-grid" class="results-grid"></div>
+            <div id="no-results" class="no-results hidden">
+              <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              <p>No resources found. Try a different search term or category.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div id="detail-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Resource details" aria-hidden="true">
+        <div class="modal-box">
+          <button id="detail-close" class="modal-close" aria-label="Close">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+          <div id="detail-content" class="detail-content"></div>
+        </div>
+      </div>
+
+      <div id="add-org-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Organization form" aria-hidden="true">
+        <div class="modal-box">
+          <button id="add-org-close" class="modal-close" aria-label="Close organization dialog">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+
+          <h2 id="org-modal-title" class="email-modal-title">Add New Organization</h2>
+          <p class="email-modal-desc">Create or update a resource entry. Only organization name is required.</p>
+
+          <form id="add-org-form" class="email-form" novalidate>
+            <div class="add-form-grid">
+              <div class="add-form-col-full">
+                <label for="org-name" class="form-label">Organization Name *</label>
+                <input id="org-name" class="search-input" type="text" maxlength="180" required />
+              </div>
+              <div class="add-form-col-full">
+                <label for="org-street" class="form-label">Street Address</label>
+                <input id="org-street" class="search-input" type="text" maxlength="200" />
+              </div>
+              <div>
+                <label for="org-city" class="form-label">City</label>
+                <input id="org-city" class="search-input" type="text" maxlength="100" />
+              </div>
+              <div>
+                <label for="org-state" class="form-label">State</label>
+                <input id="org-state" class="search-input" type="text" maxlength="40" />
+              </div>
+              <div>
+                <label for="org-zip" class="form-label">Zip Code</label>
+                <input id="org-zip" class="search-input" type="text" maxlength="20" />
+              </div>
+              <div>
+                <label for="org-phone" class="form-label">Phone Number</label>
+                <input id="org-phone" class="search-input" type="text" maxlength="30" />
+              </div>
+              <div class="add-form-col-full">
+                <label for="org-email" class="form-label">Email</label>
+                <input id="org-email" class="search-input" type="email" maxlength="254" />
+              </div>
+              <div class="add-form-col-full">
+                <label for="org-website" class="form-label">Website</label>
+                <input id="org-website" class="search-input" type="url" maxlength="500" placeholder="https://example.org" />
+              </div>
+              <div class="add-form-col-full">
+                <label for="org-description" class="form-label">Description</label>
+                <textarea id="org-description" class="search-input text-area" rows="3" maxlength="2000"></textarea>
+              </div>
+              <div class="add-form-col-full">
+                <label for="org-categories" class="form-label">Categories</label>
+                <select id="org-categories" class="category-select category-select-multi" multiple></select>
+                <p class="form-hint">Click category names to toggle multiple selections.</p>
+              </div>
+              <div class="add-form-col-full">
+                <label for="org-services" class="form-label">Services (one per line)</label>
+                <textarea id="org-services" class="search-input text-area" rows="4" placeholder="Food Pantry | Weekly grocery support&#10;Case Management | Family support and referrals"></textarea>
+                <p class="form-hint">Format: Service Name | Optional Description</p>
+              </div>
+            </div>
+
+            <button id="add-org-submit" type="submit" class="btn btn-primary modal-submit">Save Organization</button>
+          </form>
+
+          <p id="add-org-status" class="email-status" role="alert" aria-live="assertive"></p>
+        </div>
+      </div>
+
+      <div id="add-admin-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-label="Promote user to admin" aria-hidden="true">
+        <div class="modal-box modal-box--sm">
+          <button id="add-admin-close" class="modal-close" aria-label="Close add admin dialog">
+            <svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+            </svg>
+          </button>
+
+          <h2 class="email-modal-title">Promote User to Admin</h2>
+          <p class="email-modal-desc">Select an existing signed-up user to grant admin access.</p>
+
+          <form id="add-admin-form" class="email-form" novalidate>
+            <label for="admin-user-select" class="form-label">User</label>
+            <select id="admin-user-select" class="category-select" required>
+              <option value="">Select a user...</option>
+            </select>
+            <button id="add-admin-submit" type="submit" class="btn btn-primary modal-submit">Promote to Admin</button>
+          </form>
+
+          <p id="add-admin-status" class="email-status" role="alert" aria-live="assertive"></p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
