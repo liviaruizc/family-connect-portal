@@ -207,6 +207,9 @@ GRANT INSERT, UPDATE, DELETE ON public.resource_category TO authenticated;
 GRANT INSERT, UPDATE, DELETE ON public.resource_service TO authenticated;
 GRANT INSERT, UPDATE ON public.profiles TO authenticated;
 
+ALTER TABLE public.resource
+ADD COLUMN IF NOT EXISTS website TEXT;
+
 -- ============================================================================
 -- 10. INITIAL SETUP — PROMOTE YOUR FIRST ADMIN
 -- ============================================================================

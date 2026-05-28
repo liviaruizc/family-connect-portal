@@ -64,6 +64,7 @@ const locationSelect = document.getElementById('location-select');
 const resultsSection = document.getElementById('results-section');
 const resultsGrid = document.getElementById('results-grid');
 const resultsCount = document.getElementById('results-count');
+const exportAllPdfButton = document.getElementById('export-all-pdf');
 const noResults = document.getElementById('no-results');
 
 const detailModal = document.getElementById('detail-modal');
@@ -104,6 +105,7 @@ let highlightedSuggestion = -1;
 let autocompleteTimer = null;
 let orgFormMode = 'create';
 let editingResourceId = null;
+let currentResources = [];
 
 loginTab.addEventListener('click', () => setAuthMode('login'));
 signupTab.addEventListener('click', () => setAuthMode('signup'));
@@ -196,6 +198,10 @@ searchInput.addEventListener('keydown', (event) => {
 document.addEventListener('click', (event) => {
   if (event.target === searchInput || autocompleteList.contains(event.target)) return;
   hideAutocomplete();
+});
+
+exportAllPdfButton.addEventListener('click', () => {
+  exportAllResourcesPdf(currentResources);
 });
 
 detailClose.addEventListener('click', closeDetailModal);
@@ -402,6 +408,7 @@ async function loadInitialDirectory(locationKey = '') {
   resultsSection.classList.remove('hidden');
   resultsGrid.innerHTML = '<p class="loading">Loading organizations…</p>';
   noResults.classList.add('hidden');
+  setCurrentResources([]);
 
   try {
     const resources = await getAllResourcesByLocation(locationKey);
@@ -419,6 +426,7 @@ async function runSearch(query, locationKey = '') {
   resultsSection.classList.remove('hidden');
   resultsGrid.innerHTML = '<p class="loading">Searching…</p>';
   noResults.classList.add('hidden');
+  setCurrentResources([]);
   resultsCount.textContent = '';
 
   try {
@@ -435,8 +443,10 @@ function renderResults(resources, query, customLabel = '') {
   if (resources.length === 0) {
     noResults.classList.remove('hidden');
     resultsCount.textContent = '';
+    setCurrentResources([]);
     return;
   }
+  setCurrentResources(resources);
 
   resultsCount.textContent = customLabel
     ? `${resources.length} organization${resources.length !== 1 ? 's' : ''} in ${customLabel}`
@@ -601,6 +611,8 @@ function buildDetailHtml(resource) {
     </div>
   `;
 }
+
+
 
 function closeDetailModal() {
   detailModal.classList.add('hidden');
@@ -925,6 +937,110 @@ function exportResourcePdf(resource) {
   writePdfSection(doc, 'Services Offered', services, marginLeft, cursorY, contentWidth);
 
   doc.save(`${slugifyFileName(resource.organization_name)}.pdf`);
+}
+
+function exportAllResourcesPdf(resources) {
+  if (!Array.isArray(resources) || resources.length === 0) return;
+
+  const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const marginLeft = 48;
+  const marginRight = 48;
+  const contentWidth = pageWidth - marginLeft - marginRight;
+  let cursorY = 56;
+
+  doc.setFont('helvetica', 'bold');
+  doc.setFontSize(20);
+  doc.text('Family Connect Resources', marginLeft, cursorY);
+  cursorY += 18;
+
+  doc.setFont('helvetica', 'normal');
+  doc.setFontSize(10);
+  doc.text(`${resources.length} organization${resources.length !== 1 ? 's' : ''} currently displayed`, marginLeft, cursorY);
+  cursorY += 28;
+
+  resources.forEach((resource, index) => {
+    if (index > 0) {
+      cursorY += 10;
+    }
+
+    cursorY = ensurePdfSpace(doc, cursorY, 90);
+
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(14);
+
+    const title = `${index + 1}. ${sanitizeFormValue(resource.organization_name) || 'Organization'}`;
+    const titleLines = doc.splitTextToSize(title, contentWidth);
+    doc.text(titleLines, marginLeft, cursorY);
+    cursorY += (titleLines.length * 16) + 6;
+
+    const city = sanitizeFormValue(resource.city);
+    const state = sanitizeFormValue(resource.state);
+    const address = [
+      sanitizeFormValue(resource.street_address),
+      [city, state].filter(Boolean).join(', '),
+      sanitizeFormValue(resource.zip_code),
+    ].filter(Boolean).join(', ') || 'Location not listed';
+
+    const categories = normalizeCategoriesForPdf(resource.categories);
+    const phoneNumber = sanitizeFormValue(resource.phone_number);
+    const email = sanitizeFormValue(resource.email);
+    const website = sanitizeFormValue(resource.website);
+    const description = sanitizeFormValue(resource.description) || 'No description available.';
+
+    const lines = [
+      `Location: ${address}`,
+      `Categories: ${categories || 'None listed'}`,
+      phoneNumber ? `Phone: ${phoneNumber}` : '',
+      email ? `Email: ${email}` : '',
+      website ? `Website: ${website}` : '',
+      `Description: ${description}`,
+    ].filter(Boolean);
+
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+
+    lines.forEach((line) => {
+      const wrappedLines = doc.splitTextToSize(line, contentWidth);
+      const blockHeight = wrappedLines.length * 13;
+      cursorY = ensurePdfSpace(doc, cursorY, blockHeight);
+      doc.text(wrappedLines, marginLeft, cursorY);
+      cursorY += blockHeight + 4;
+    });
+  });
+
+  doc.save('family-connect-resources.pdf');
+}
+
+function setCurrentResources(resources) {
+  currentResources = Array.isArray(resources) ? resources : [];
+  const hasResources = currentResources.length > 0;
+  exportAllPdfButton.classList.toggle('hidden', !hasResources);
+  exportAllPdfButton.disabled = !hasResources;
+}
+
+function normalizeCategoriesForPdf(categories) {
+  if (Array.isArray(categories)) {
+    return categories
+      .map((category) => sanitizeFormValue(category?.name ?? category))
+      .filter(Boolean)
+      .join(', ');
+  }
+
+  return sanitizeFormValue(categories);
+}
+
+function ensurePdfSpace(doc, cursorY, requiredHeight) {
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const bottomMargin = 56;
+
+  if (cursorY + requiredHeight <= pageHeight - bottomMargin) {
+    return cursorY;
+  }
+
+  doc.addPage();
+  return 56;
 }
 
 function writePdfSection(doc, label, value, marginLeft, cursorY, contentWidth) {
