@@ -131,7 +131,15 @@
 
         <section id="results-section" class="results-section hidden" aria-live="polite">
           <div class="results-inner">
-            <p id="results-count" class="results-count"></p>
+            <div class="results-toolbar">
+              <p id="results-count" class="results-count"></p>
+              <button id="export-all-pdf" type="button" class="btn btn-outline btn-small hidden" disabled>
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                  <path d="M5 20h14v-2H5v2zm7-18v10.17l3.59-3.58L17 10l-5 5-5-5 1.41-1.41L11 12.17V2h1z"/>
+                </svg>
+                Export All
+              </button>
+            </div>
             <div id="results-grid" class="results-grid"></div>
             <div id="no-results" class="no-results hidden">
               <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>

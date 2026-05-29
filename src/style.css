@@ -497,10 +497,18 @@ img, svg { display: block; }
   padding: 0 var(--space-6);
 }
 
+.results-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
 .results-count {
   font-size: var(--text-sm);
   color: var(--color-text-muted);
-  margin-bottom: var(--space-4);
+  margin-bottom: 0;
 }
 
 /* Responsive auto-fill grid — cards are at least 300px wide */
@@ -868,6 +876,16 @@ dd {
   .search-input,
   .category-select,
   .search-btn { width: 100%; flex: none; }
+
+  .results-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .results-toolbar .btn {
+    justify-content: center;
+    width: 100%;
+  }
 
   /* Single-column detail grid on mobile */
   .detail-grid { grid-template-columns: 1fr; }
